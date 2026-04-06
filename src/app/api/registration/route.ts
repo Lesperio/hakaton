@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { resend } from '@/shared/lib/resend';
+import { getResend } from '@/shared/lib/resend';
 import { allowRegistrationSubmit, clientIpFromRequest } from '@/shared/lib/registration-rate-limit';
 import {
   LIMITS,
@@ -168,6 +168,12 @@ export async function POST(request: Request) {
 
     const from =
       process.env.RESEND_FROM_EMAIL?.trim() || 'Hackathon Registration <onboarding@resend.dev>';
+
+    const resend = getResend();
+    if (!resend) {
+      console.error('Missing RESEND_API_KEY');
+      return secureJson({ success: false, message: 'Сервер не настроен для отправки почты' }, 500);
+    }
 
     const { error } = await resend.emails.send({
       from,
