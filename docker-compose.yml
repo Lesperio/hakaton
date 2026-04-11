@@ -1,0 +1,71 @@
+# VPS: скопируйте .env.example в .env, укажите DOMAIN и CERTBOT_EMAIL, DNS A-запись на IP сервера.
+# Запуск: docker compose up -d --build
+# Первый сертификат (после того как :80 доступен снаружи): ./scripts/init-ssl.sh
+# Let's Encrypt ~90 дней; контейнер certbot делает renew; nginx перечитывает сертификаты каждые 12 ч (cron в образе).
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    networks:
+      - web
+
+  nginx:
+    build: ./deploy/nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # На VPS задайте реальный домен в .env (для Let's Encrypt server_name).
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - certbot_conf:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      - app
+    networks:
+      - web
+
+  # Первый выпуск сертификата: ./scripts/init-ssl.sh (или docker compose run --rm certbot-cli certonly ...)
+  certbot-cli:
+    image: certbot/certbot:v2.11.0
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    networks:
+      - web
+    profiles:
+      - cli
+
+  certbot-renew:
+    image: certbot/certbot:v2.11.0
+    restart: unless-stopped
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        trap exit TERM
+        while :; do
+          certbot renew --webroot -w /var/www/certbot --quiet || true
+          sleep 12h & wait $$!
+        done
+    depends_on:
+      - nginx
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  certbot_conf:
+  certbot_www:

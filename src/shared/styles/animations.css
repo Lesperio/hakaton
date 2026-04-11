@@ -1,0 +1,158 @@
+
+
+@keyframes blob-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+@keyframes blob-pulse-alt {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.5;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes member-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes success-pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-panel-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+}
+
+@theme {
+  --animate-blob-slow: blob-pulse 8s ease-in-out infinite;
+  --animate-blob-slower: blob-pulse-alt 10s ease-in-out 1s infinite;
+  --animate-fade-up: fade-up 0.8s ease-out both;
+  --animate-fade-up-delayed: fade-up 0.8s ease-out 0.3s both;
+  --animate-fade-up-section: fade-up 0.6s ease-out both;
+  --animate-member-row: member-in 0.35s ease-out both;
+  --animate-success-icon: success-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+  --animate-modal-backdrop-in: modal-backdrop-in 0.25s ease-out both;
+  --animate-modal-panel-in: modal-panel-in 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+  --animate-modal-backdrop-out: modal-backdrop-out 0.2s ease-in both;
+  --animate-modal-panel-out: modal-panel-out 0.2s ease-in both;
+}
+
+@supports (animation-timeline: view()) {
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-reveal-up {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  .animate-reveal-up {
+    animation: fade-up 0.65s ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob-slow,
+  .animate-blob-slower,
+  .animate-fade-up,
+  .animate-fade-up-delayed,
+  .animate-fade-up-section,
+  .animate-member-row,
+  .animate-success-icon,
+  .animate-modal-backdrop-in,
+  .animate-modal-panel-in,
+  .animate-modal-backdrop-out,
+  .animate-modal-panel-out,
+  .animate-reveal-up {
+    animation: none !important;
+  }
+
+  .hero-blob-a,
+  .hero-blob-b {
+    opacity: 0.35;
+    transform: none;
+  }
+}
